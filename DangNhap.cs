@@ -1,4 +1,6 @@
-﻿using System;
+using NT106_2._2;
+using NT1062._2a;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,11 +9,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace NT1062._2
 {
-    public partial class DangNhap: Form
+    public partial class DangNhap : Form
     {
         public DangNhap()
         {
@@ -152,19 +155,38 @@ namespace NT1062._2
         {
             string username = textBox1.Text.Trim();
             string password = textBox2.Text.Trim();
+
             if (string.IsNullOrEmpty(username))
             {
-                MessageBox.Show("Vui lòng nhập tên tài khoản!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                textBox1.Focus();
+                MessageBox.Show("Vui lòng nhập tên tài khoản!");
+                return;
+            }
+            if (string.IsNullOrEmpty(password))
+            {
+                MessageBox.Show("Vui lòng nhập mật khẩu!");
                 return;
             }
 
-            if (string.IsNullOrEmpty(password))
+            Modify modify = new Modify();
+            string hashedPassword = hashpassword.ToSHA256(password);
+
+            string query = $"SELECT * FROM USERS WHERE USERNAME = '{username}' AND PASSWORD = '{hashedPassword}'";
+            if (modify.Accounts(query).Count != 0)
             {
-                MessageBox.Show("Vui lòng nhập mật khẩu!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                textBox2.Focus();
-                return;
+                MessageBox.Show("Đăng nhập thành công!");
+            }
+            else
+            {
+                MessageBox.Show("Tên tài khoản hoặc mật khẩu không đúng!");
             }
         }
+        private void buttonDangKy_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            DangKy dangKyForm = new DangKy();
+            dangKyForm.ShowDialog();
+            this.Show();
+        }
+
     }
 }
