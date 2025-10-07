@@ -1,13 +1,17 @@
-﻿using System;
+using NT106_2._2;
+using NT1062._2;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Text.RegularExpressions;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 namespace NT1062._2a
 {
     public partial class DangKy: Form
@@ -155,6 +159,29 @@ namespace NT1062._2a
                 return;
             }
 
+            Modify modify = new Modify();
+            string hashedPassword = hashpassword.ToSHA256(matKhau);
+            if (modify.Accounts("Select * from USERS where Email = '" + email + "'").Count != 0)
+            {
+                MessageBox.Show("Email này đã được đăng ký, vui lòng nhập email khác!");
+            }
+            else
+            {
+                try
+                {
+                    string query = $"INSERT INTO USERS (USERNAME, PASSWORD, EMAIL, MOBILENUMBER, FULLNAME) " +
+                                           $"VALUES ('{tenTK}', '{hashedPassword}', '{email}', '{SDT}', '{fullname}')";
+                    modify.Command(query);
+                    MessageBox.Show("Đăng ký thành công!");
+                    this.Hide();
+                    new DangNhap().ShowDialog();
+                    this.Close();
+                }
+                catch
+                {
+                    MessageBox.Show("Tên tài khoản này đã được đăng ký, vui lòng đăng ký tên tài khoản khác!");
+                }
+            }
         }
     }
 }
